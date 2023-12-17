@@ -22,14 +22,22 @@ class UsersFragment : BaseFragment<FragmentUsersBinding>(FragmentUsersBinding::i
 
     override fun setUp() {
         binding.recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
-        usersAdapter = UsersRecyclerViewAdapter()
-        binding.recyclerViewUsers.adapter = usersAdapter
-        setUpListeners()
+        binding.recyclerViewUsers.adapter = UsersRecyclerViewAdapter().apply {
+            usersAdapter = this
+        }
     }
 
     override fun setUpObservers() {
         recyclerPagingDataObserver()
         loadStateObserver()
+    }
+
+    override fun setUpListeners() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            userViewModel.refreshData()
+            usersAdapter.refresh()
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     private fun recyclerPagingDataObserver() {
@@ -39,14 +47,6 @@ class UsersFragment : BaseFragment<FragmentUsersBinding>(FragmentUsersBinding::i
                     usersAdapter.submitData(it)
                 }
             }
-        }
-    }
-
-    private fun setUpListeners() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            userViewModel.refreshData()
-            usersAdapter.refresh()
-            binding.swipeRefreshLayout.isRefreshing = false
         }
     }
 
