@@ -12,19 +12,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskn18.AppError
 import com.example.taskn18.BaseFragment
 import com.example.taskn18.databinding.FragmentUsersBinding
+import com.example.taskn18.users.event.GetUsersDataEvent
 import com.example.taskn18.users.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 class UsersFragment : BaseFragment<FragmentUsersBinding>(FragmentUsersBinding::inflate) {
 
     private val userViewModel: UserViewModel by viewModels()
-    private lateinit var usersAdapter: UsersRecyclerViewAdapter
+    private var usersAdapter = UsersRecyclerViewAdapter()
 
     override fun setUp() {
         binding.recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerViewUsers.adapter = UsersRecyclerViewAdapter().apply {
-            usersAdapter = this
-        }
+        binding.recyclerViewUsers.adapter = usersAdapter
+        userViewModel.handleEvent(GetUsersDataEvent.InitialData)
     }
 
     override fun setUpObservers() {
@@ -34,7 +34,7 @@ class UsersFragment : BaseFragment<FragmentUsersBinding>(FragmentUsersBinding::i
 
     override fun setUpListeners() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            userViewModel.refreshData()
+            userViewModel.handleEvent(GetUsersDataEvent.RefreshData)
             usersAdapter.refresh()
             binding.swipeRefreshLayout.isRefreshing = false
         }

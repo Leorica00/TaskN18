@@ -18,15 +18,14 @@ sealed class AppError(open val message: String) {
             return when (throwable) {
                 is IOException -> NetworkError("Network error occurred: No Internet")
                 is HttpException -> {
+                    val errorModel = throwable.response()?.errorBody()?.string()
+                        ?.let { RetrofitClient.errorResponse().fromJson(it) }
                     when (throwable.code()) {
                         in 400..499 -> {
-                            val errorModel = throwable.response()?.errorBody()?.string()
-                                ?.let { RetrofitClient.errorResponse().fromJson(it) }
                             ClientError(errorModel?.error.toString())
                         }
-
-                        in 500..599 -> ServerError("Server error occurred")
-                        else -> HttpError("Http error occurred")
+                        in 500..599 -> ServerError(errorModel?.error.toString())
+                        else -> HttpError(errorModel?.error.toString())
                     }
                 }
 

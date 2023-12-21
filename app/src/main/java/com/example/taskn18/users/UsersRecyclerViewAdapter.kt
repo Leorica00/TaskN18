@@ -38,7 +38,7 @@ class UsersRecyclerViewAdapter :
     }
 
     companion object {
-        val myItemDiffCallback = object : DiffUtil.ItemCallback<User>() {
+        private val myItemDiffCallback = object : DiffUtil.ItemCallback<User>() {
 
             override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
                 return oldItem.id == newItem.id
